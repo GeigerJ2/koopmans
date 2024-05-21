@@ -7,8 +7,10 @@ Written by Edward Linscott Sep 2020
 """
 
 import os
+from pathlib import Path
 
 import numpy as np
+from aiida.tools.dumping.processes import ProcessDumper
 from aiida_koopmans.helpers import get_builder_from_ase
 from ase import Atoms
 from ase.calculators.espresso import Espresso
@@ -78,6 +80,10 @@ class PWCalculator(CalculatorExt, Espresso, ReturnsBandStructure, CalculatorABC)
             builder = get_builder_from_ase(pw_calculator=self)
             from aiida.engine import run_get_node, submit
             running = run_get_node(builder)
+
+            process_dumper = ProcessDumper()
+            output_path = Path(os.getcwd()) / self.parameters.calculation
+            process_dumper.dump(process_node=running.node, output_path=output_path)
             
             # once the running if completed
             self.wchain = running[-1]

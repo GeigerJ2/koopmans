@@ -7,7 +7,9 @@ Written by Edward Linscott Feb 2021
 """
 
 import os
+from pathlib import Path
 
+from aiida.tools.dumping.processes import ProcessDumper
 from aiida_koopmans.helpers import from_wann2kc_to_KcwCalculation
 from ase import Atoms
 from ase.calculators.espresso import Wann2KC
@@ -48,6 +50,10 @@ class Wann2KCCalculator(KCWannCalculator, Wann2KC, CalculatorABC):
             builder = from_wann2kc_to_KcwCalculation(wann2kc_calculator=self)
             from aiida.engine import run_get_node, submit
             running = run_get_node(builder)
+
+            process_dumper = ProcessDumper()
+            output_path = Path(os.getcwd()) / self.parameters.calculation
+            process_dumper.dump(process_node=running.node, output_path=output_path)
             
             # once the running if completed
             self.calculation = running[-1]

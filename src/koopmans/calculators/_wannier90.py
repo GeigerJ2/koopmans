@@ -7,8 +7,10 @@ Written by Edward Linscott Sep 2020
 """
 
 import os
+from pathlib import Path
 
 import numpy as np
+from aiida.tools.dumping.processes import ProcessDumper
 from ase import Atoms
 from ase.calculators.wannier90 import Wannier90
 from ase.dft.kpoints import BandPath
@@ -56,8 +58,12 @@ class Wannier90Calculator(CalculatorExt, Wannier90, CalculatorABC):
 
         if not self.mode == "ase":
             # here I create the builder elsewhere.
-            from aiida.engine import run_get_node,submit
+            from aiida.engine import run_get_node, submit
             running = run_get_node(self.builder_aiida)
+
+            process_dumper = ProcessDumper()
+            output_path = Path(os.getcwd()) / self.parameters.calculation
+            process_dumper.dump(process_node=running.node, output_path=output_path)
 
             # once the running if completed
             self.wchain = running[-1]

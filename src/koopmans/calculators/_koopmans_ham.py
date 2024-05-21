@@ -7,9 +7,11 @@ Written by Edward Linscott Feb 2021
 """
 
 import os
+from pathlib import Path
 from typing import List, Optional
 
 import numpy as np
+from aiida.tools.dumping.processes import ProcessDumper
 from aiida_koopmans.helpers import from_kcwham_to_KcwCalculation
 from ase import Atoms
 from ase.calculators.espresso import KoopmansHam
@@ -145,6 +147,10 @@ class KoopmansHamCalculator(KCWannCalculator, KoopmansHam, ReturnsBandStructure,
             builder = from_kcwham_to_KcwCalculation(kcw_calculator=self)
             from aiida.engine import run_get_node, submit
             running = run_get_node(builder)
+
+            process_dumper = ProcessDumper()
+            output_path = Path(os.getcwd()) / self.parameters.calculation
+            process_dumper.dump(process_node=running.node, output_path=output_path)
             
             # once the running if completed
             self.calculation = running[-1]

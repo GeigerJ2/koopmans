@@ -373,6 +373,21 @@ class Workflow(ABC):
         if not self.parent:
             self._teardown()
 
+        # print('#'*80)
+        # from pathlib import Path
+
+        # from aiida.orm import load_node
+        # from aiida.tools.dumping.processes import ProcessDumper
+        # wc_node = load_node('e57abdff-4ae7-4fc9-8e93-cc001070f0e8')
+        # output_path = Path('/home/geiger_j/aiida_projects/aiida-koopmans/temp/dumps')
+        # print(wc_node)
+        # process_dumper = ProcessDumper(overwrite=True)
+        # process_dumper.dump(wc_node, output_path=output_path / 'workflow-dump')
+        # print(self.calculations)
+        # for calculation in self.calculations:
+        #     print(type(calculation), calculation)
+        # raise SystemExit("hello")
+
     @abstractmethod
     def _run(self) -> None:
         ...
@@ -681,7 +696,7 @@ class Workflow(ABC):
         if directory is not None:
             calc.directory = directory
 
-        
+
         # MB mod. bad hard coding for now.
         if not self.parameters.mode == 'ase':
             calc.mode = self.parameters.mode
@@ -694,7 +709,7 @@ class Workflow(ABC):
                 calc.parent_folder = self.dft_wchains["scf"].outputs.remote_folder
         else: # MB comment: I did the following but I don't like it:
             calc.mode = "ase"
-        
+
         return calc
 
     def primitive_to_supercell(self, matrix: Optional[npt.NDArray[np.int_]] = None, **kwargs):
